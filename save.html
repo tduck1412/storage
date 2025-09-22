@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tduck Saving — Trang cá nhân</title>
+  <style>
+    body{font-family:system-ui,Arial,sans-serif;max-width:800px;margin:20px auto;padding:20px;color:#222}
+    h1{font-size:24px;margin-bottom:16px;text-align:center}
+    .form{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+    input[type=text]{padding:8px;border-radius:6px;border:1px solid #ccc}
+    button{padding:10px;border:none;border-radius:6px;cursor:pointer;background:#0b61ff;color:#fff}
+    button:hover{opacity:0.9}
+    ul{list-style:none;padding:0;margin:0}
+    li{background:#f9f9f9;margin-bottom:8px;padding:10px;border-radius:6px;display:flex;flex-direction:column}
+    .title{font-weight:bold;margin-bottom:4px}
+    .url a{color:#0b61ff;word-break:break-all}
+    .actions{margin-top:6px}
+    .actions button{background:#e33;color:#fff;padding:6px 8px;font-size:12px}
+  </style>
+</head>
+<body>
+  <h1>📌 Trang cá nhân — Tduck Saving</h1>
+
+  <div class="form">
+    <input id="title" type="text" placeholder="Nhập nội dung / tiêu đề" />
+    <input id="url" type="text" placeholder="Nhập đường link (ví dụ: google.com hoặc http://...)" />
+    <button id="saveBtn">Lưu</button>
+  </div>
+
+  <ul id="list"></ul>
+
+  <script>
+    // Dữ liệu sẽ lưu trực tiếp trong code thay vì localStorage
+    let links = [
+      {title: "Google", url: "http://google.com"},
+      {title: "YouTube", url: "http://youtube.com"}
+    ];
+
+    const titleIn = document.getElementById('title');
+    const urlIn = document.getElementById('url');
+    const saveBtn = document.getElementById('saveBtn');
+    const listEl = document.getElementById('list');
+
+    function normalizeUrl(u){
+      let url = u.trim();
+      if(!/^https?:\/\//i.test(url)){
+        url = 'http://' + url;
+      }
+      return url;
+    }
+
+    function render(){
+      listEl.innerHTML = '';
+      if(links.length===0){ listEl.innerHTML = '<li>(Chưa có link nào được lưu)</li>'; return; }
+      links.forEach((item, idx)=>{
+        const li = document.createElement('li');
+        const title = document.createElement('div'); title.className='title'; title.textContent = item.title;
+        const url = document.createElement('div'); url.className='url';
+        const a = document.createElement('a'); a.href = item.url; a.target='_blank'; a.textContent = item.url;
+        url.appendChild(a);
+
+        const actions = document.createElement('div'); actions.className='actions';
+        const delBtn = document.createElement('button'); delBtn.textContent = 'Xóa';
+        delBtn.onclick = ()=>{ links.splice(idx,1); render(); };
+        actions.appendChild(delBtn);
+
+        li.appendChild(title);
+        li.appendChild(url);
+        li.appendChild(actions);
+        listEl.appendChild(li);
+      });
+    }
+
+    function addItem(){
+      const title = titleIn.value.trim();
+      let url = urlIn.value.trim();
+      if(!title || !url){ alert('Vui lòng nhập đầy đủ nội dung và đường link'); return; }
+      url = normalizeUrl(url);
+      links.unshift({title, url});
+      titleIn.value=''; urlIn.value='';
+      render();
+    }
+
+    saveBtn.addEventListener('click', addItem);
+
+    render();
+  </script>
+</body>
+</html>
